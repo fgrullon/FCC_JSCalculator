@@ -1,92 +1,107 @@
-var round = function(text, pos) {
-    function setCharAt(str,index,chr) {
-       if(index > str.length-1) return str;
-        return str.substr(0,index) + chr + str.substr(index+1);
-    }
-    if (text.length > pos) {
-        for (i=1;i<text.length;i++){
-            if (text[i] === ".") {
-                i = text.length;
-                if (parseFloat(text[pos],10) >= 5) {
-                    text = (setCharAt(text,pos-1,((parseFloat(text[pos-1],10))+1).toString(10))).substr(0,pos);
-                } else {
-                    text = text.substr(0,pos);
-                }
-            } 
-        }
-    }
-    return text;
-};
-
-
-var $ = jQuery.noConflict();
 $(function() {
 
-    function lengthLimit(number){
-        if(number > 9){
-            totaldiv.text(number.substr(number.length-9,9));
-        }
-    }
-
+    var operation = [];
     var number = "";
     var newnumber = "";
     var operator = "";
-    var totaldiv = $("#total");
+    var totaldiv = $(".total");
     totaldiv.text("0");
-    $("#numbers > a").not("#clear").click(function(){
-		number += $(this).text();
-		totaldiv.text(number);
-		lengthLimit(number);
-    });
-    
-    $("#operators > a").not("#equals").click(function(){
-		operator = $(this).text();
-		newnumber = number;
-		number = "";
-		totaldiv.text("0");
+
+    $(".numbers > a").not(".clear").click(function(){
+        number += $(this).text();
+        
+        if(number.length > 15){
+
+            totaldiv.text("Err Length Limit Reach");
+
+        }else if(number.length > 9){
+
+            document.getElementById("total").style.fontSize = "30px";
+            totaldiv.text(number);
+
+        }else{
+            totaldiv.text(number);
+        }
+        
+
     });
 
-    $("#clear").click(function(){
-		number = "";
-		totaldiv.text("0");
+    $(".operators > a").not(".equals").click(function(){
+        operator = $(this).text();
+        newnumber = number;
+        operation.push(number);
+        operation.push(operator);
+        number = "";
+        totaldiv.text("0");
+    });
+
+    $(".clear").click(function(){
+        number = "";
+        totaldiv.text("0");
         newnumber = "";
+        
 
     });
 
-    $("#equals").click(function(){
+    $(".equals").click(function(){
+        number = number.slice(0, -1);
+        operation.push(number);
         number = parseInt(number, 10);
         newnumber = parseInt(newnumber,10);
 
-		if (operator === "+"){
+        console.log(operation);
 
-			number = (newnumber + number).toString(10);
 
-		} else if (operator === "-"){
+        var total  = process_operations(operation).toString();
+        total = +total + 0;
 
-			number = (newnumber - number).toString(10);
-
-		} else if (operator === "/"){
-
-			number = (newnumber / number).toString(10);
-
-		} else if (operator === "*"){
-
-			number = (newnumber * number).toString(10);
-
-		}
-
-        if(number.length <= 9){
-            totaldiv.text(number);
+        if(total.length > 9){
+            document.getElementById("total").style.fontSize = "30px";
+            totaldiv.text(total);
+        }else{
+            totaldiv.text(total);
         }
-         if(number.length <= 20){
-            totaldiv.text(number).fontSize = "20px";
 
-        }
-		
-		lengthLimit(number);
-		number = "";
-		newnumber = "";
+        number = "";
+        newnumber = "";
     });
 
 
 }); 
+
+
+function process_operations(operation){
+            og = operation;
+            while(operation.indexOf("*") > 0){
+                var index = operation.indexOf("*");
+                var total = (+operation[index - 1] * +operation[index + 1]);
+                operation.splice(index - 1, 3, total);
+                console.log("* : "+operation);
+                
+            }
+            
+           while(operation.indexOf("/") > 0){
+                var index = operation.indexOf("/");
+                var total = (+operation[index - 1] / +operation[index + 1]);
+                operation.splice(index - 1, 3, total);
+                console.log("/ : "+operation);
+                
+            }
+  
+            while(operation.indexOf("+") > 0){
+                var index = operation.indexOf("+");
+                var total = (+operation[index - 1] + +operation[index + 1]);
+                operation.splice(index - 1, 3, total);
+                console.log("+ : "+operation);
+            }
+
+           while(operation.indexOf("-") > 0){
+                var index = operation.indexOf("-");
+                var total = (+operation[index - 1] - +operation[index + 1]);
+                operation.splice(index - 1, 3, total);
+                console.log("- : "+operation);
+            }
+
+            return parseFloat(operation).toFixed(2);
+
+}
