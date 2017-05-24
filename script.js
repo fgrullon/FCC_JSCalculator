@@ -46,11 +46,6 @@ $(function() {
     $(".equals").click(function(){
         number = number.slice(0, -1);
         operation.push(number);
-        number = parseInt(number, 10);
-        newnumber = parseInt(newnumber,10);
-
-        console.log(operation);
-
 
         var total  = process_operations(operation).toString();
         total = +total + 0;
@@ -62,6 +57,7 @@ $(function() {
             totaldiv.text(total);
         }
 
+        operation = [];
         number = "";
         newnumber = "";
     });
@@ -71,7 +67,7 @@ $(function() {
 
 
 function process_operations(operation){
-            og = operation;
+    
             while(operation.indexOf("*") > 0){
                 var index = operation.indexOf("*");
                 var total = (+operation[index - 1] * +operation[index + 1]);
